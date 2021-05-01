@@ -1,0 +1,6 @@
+id=BluetoothDeviceClassEditor
+name=Bluetooth Device Class Editor
+version=v1
+versionCode=1
+author=TeamJCD
+description=Magisk module which extends the Bluetooth Settings with a Device Class Editor
