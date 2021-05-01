@@ -1,5 +1,5 @@
-# BluetoothDeviceClassPreference
-# by dtrunk90
+# BluetoothDeviceClassEditor
+# by TeamJCD
 
 # working directory variables
 settingsbasename=Settings
@@ -7,7 +7,7 @@ settingspath=`find $(magisk --path)/.magisk/mirror/system -mindepth 2 -name $set
 backupdir=$MODPATH/backup
 toolsdir=$MODPATH/tools
 archtoolsdir=$toolsdir/$ARCH
-tmpdir=$TMPDIR/BluetoothDeviceClassPreference
+tmpdir=$TMPDIR/BluetoothDeviceClassEditor
 
 # set up extracted files and directories
 chmod -R 755 $archtoolsdir
