@@ -39,6 +39,7 @@ decode() {
 
 patchsettings() {
   ui_print "- Patching $settingsbasename.apk"
+  cp -R common/* $tmpdir/$settingsbasename/
   # patching will be done here; modify resources using xmlstarlet
 }
 
