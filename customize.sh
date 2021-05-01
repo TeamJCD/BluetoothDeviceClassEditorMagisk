@@ -40,7 +40,28 @@ decode() {
 patchsettings() {
   ui_print "- Patching $settingsbasename.apk"
   cp -R common/* $tmpdir/$settingsbasename/
-  # patching will be done here; modify resources using xmlstarlet
+
+  xmlstarlet ed -S \
+    --subnode '/manifest/application' \
+    --type elem -n provider \
+    --insert '//provider[not(@android:name)]' \
+    --type attr -n android:enabled -v "true" \
+    --insert '//provider[not(@android:name)]' \
+    --type attr -n android:authorities -v "com.github.teamjcd.android.settings.bluetooth.db.BluetoothDeviceClassContentProvider" \
+    --insert '//provider[not(@android:name)]' \
+    --type attr -n android:name -v "com.github.teamjcd.android.settings.bluetooth.db.BluetoothDeviceClassContentProvider" \
+    $tmpdir/$settingsbasename/AndroidManifest.xml
+
+  xmlstarlet ed -L \
+    --append '/PreferenceScreen/Preference[@android:key="bluetooth_screen_bt_pair_rename_devices"]' \
+    --type elem -n Preference \
+    --insert '/PreferenceScreen/Preference[not(@android:key)]' \
+    --type attr -n android:title -v "@string/bluetooth_device_class" \
+    --insert '/PreferenceScreen/Preference[not(@android:key)]' \
+    --type attr -n settings:controller -v "com.github.teamjcd.android.settings.bluetooth.BluetoothDeviceClassPreferenceController" \
+    --insert '/PreferenceScreen/Preference[not(@android:key)]' \
+    --type attr -n android:key -v "bluetooth_screen_bt_pair_change_device_class" \
+    $tmpdir/$settingsbasename/res/xml/bluetooth_screen.xml
 }
 
 build() {
