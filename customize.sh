@@ -41,7 +41,7 @@ patchsettings() {
   ui_print "- Patching $settingsbasename.apk"
   cp -R common/* $tmpdir/$settingsbasename/
 
-  xmlstarlet ed -S \
+  xmlstarlet ed -L -S \
     --subnode '/manifest/application' \
     --type elem -n provider \
     --insert '//provider[not(@android:name)]' \
@@ -52,7 +52,40 @@ patchsettings() {
     --type attr -n android:name -v "com.github.teamjcd.android.settings.bluetooth.db.BluetoothDeviceClassContentProvider" \
     $tmpdir/$settingsbasename/AndroidManifest.xml
 
-  xmlstarlet ed -L \
+  xmlstarlet ed -L -S \
+    --subnode '/manifest/application' \
+    --type elem -n activity \
+    --insert '//activity[not(@android:name)]' \
+    --type attr -n android:configChanges -v "orientation|keyboardHidden|screenSize" \
+    --insert '//activity[not(@android:name)]' \
+    --type attr -n android:label -v "@string/bluetooth_device_class_settings" \
+    --subnode '//activity[not(@android:name)]' \
+    --type elem -n intent-filter \
+    --insert '//activity[not(@android:name)]/intent-filter' \
+    --type attr -n android:priority -v 1 \
+    --subnode '//activity[not(@android:name)]/intent-filter' \
+    --type elem -n action \
+    --insert '//activity[not(@android:name)]/intent-filter/action' \
+    --type attr -n android:name -v "com.github.teamjcd.android.settings.bluetooth.BluetoothDeviceClassSettings.BLUETOOTH_DEVICE_CLASS_SETTINGS" \
+    --subnode '//activity[not(@android:name)]/intent-filter' \
+    --type elem -n category \
+    --insert '//activity[not(@android:name)]/intent-filter/category' \
+    --type attr -n android:name -v "android.intent.category.DEFAULT" \
+    --subnode '//activity[not(@android:name)]' \
+    --type elem -n intent-filter \
+    --subnode '//activity[not(@android:name)]/intent-filter[not(@android:priority)]' \
+    --type elem -n action \
+    --insert '//activity[not(@android:name)]/intent-filter[not(@android:priority)]/action' \
+    --type attr -n android:name -v "android.intent.action.MAIN" \
+    --subnode '//activity[not(@android:name)]/intent-filter[not(@android:priority)]' \
+    --type elem -n category \
+    --insert '//activity[not(@android:name)]/intent-filter[not(@android:priority)]/category' \
+    --type attr -n android:name -v "android.intent.category.DEFAULT" \
+    --insert '//activity[not(@android:name)]' \
+    --type attr -n android:name -v "com.github.teamjcd.android.settings.bluetooth.BluetoothDeviceClassSettingsActivity" \
+    $tmpdir/$settingsbasename/AndroidManifest.xml
+
+  xmlstarlet ed -L -S \
     --append '/PreferenceScreen/Preference[@android:key="bluetooth_screen_bt_pair_rename_devices"]' \
     --type elem -n Preference \
     --insert '/PreferenceScreen/Preference[not(@android:key)]' \
