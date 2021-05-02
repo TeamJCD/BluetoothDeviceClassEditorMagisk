@@ -13,6 +13,15 @@ tmpdir=$TMPDIR/BluetoothDeviceClassEditor
 chmod -R 755 $archtoolsdir
 alias xmlstarlet=$archtoolsdir/xmlstarlet
 
+debug() {
+  ui_print "- Debug:"
+  ui_print "  settingspath: $settingspath"
+  ui_print "  backupdir: $backupdir"
+  ui_print "  toolsdir: $toolsdir"
+  ui_print "  archtoolsdir: $archtoolsdir"
+  ui_print "  tmpdir: $tmpdir"
+}
+
 apktool_d() {
   ANDROID_DATA=$tmpdir ANDROID_ROOT=/system LD_LIBRARY_PATH=/system/lib dalvikvm -Xbootclasspath:/system/framework/core.jar:/system/framework/conscrypt.jar:/system/framework/apache-xml.jar -classpath $toolsdir/apktool_*-dexed.jar brut.apktool.Main d --frame-path $tmpdir/framework -o $tmpdir/$(basename $1 .apk) $1
   test $? != 0 && abort "Decoding APK resources failed. Aborting..."
@@ -174,6 +183,7 @@ otasurvival() {
   sed -i "s|previoussettingsmd5sum_tmp|previoussettingsmd5sum=`md5sum $settingspath`|" service.sh
 }
 
+debug
 backup
 decode
 patchsettings
