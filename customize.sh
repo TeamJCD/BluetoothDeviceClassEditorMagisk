@@ -73,14 +73,20 @@ patchsettings() {
     --type attr -n android:name -v "android.intent.category.DEFAULT" \
     --subnode '//activity[not(@android:name)]' \
     --type elem -n intent-filter \
-    --subnode '//activity[not(@android:name)]/intent-filter[not(@android:priority)]' \
+    --subnode '//activity[not(@android:name)]/intent-filter[2]' \
     --type elem -n action \
-    --insert '//activity[not(@android:name)]/intent-filter[not(@android:priority)]/action' \
+    --insert '//activity[not(@android:name)]/intent-filter[2]/action' \
     --type attr -n android:name -v "android.intent.action.MAIN" \
-    --subnode '//activity[not(@android:name)]/intent-filter[not(@android:priority)]' \
+    --subnode '//activity[not(@android:name)]/intent-filter[2]' \
     --type elem -n category \
-    --insert '//activity[not(@android:name)]/intent-filter[not(@android:priority)]/category' \
+    --insert '//activity[not(@android:name)]/intent-filter[2]/category' \
     --type attr -n android:name -v "android.intent.category.DEFAULT" \
+    --subnode '//activity[not(@android:name)]' \
+    --type elem -n meta-data \
+    --insert '//activity[not(@android:name)]/meta-data' \
+    --type attr -n android:name -v "com.android.settings.FRAGMENT_CLASS" \
+    --insert '//activity[not(@android:name)]/meta-data' \
+    --type attr -n android:value -v "com.github.teamjcd.android.settings.bluetooth.BluetoothDeviceClassSettings" \
     --insert '//activity[not(@android:name)]' \
     --type attr -n android:name -v "com.github.teamjcd.android.settings.bluetooth.BluetoothDeviceClassSettingsActivity" \
     $tmpdir/$settingsbasename/AndroidManifest.xml
