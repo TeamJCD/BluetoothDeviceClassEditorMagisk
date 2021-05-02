@@ -55,10 +55,6 @@ patchsettings() {
   xmlstarlet ed -L -S \
     --subnode '/manifest/application' \
     --type elem -n activity \
-    --insert '//activity[not(@android:name)]' \
-    --type attr -n android:configChanges -v "orientation|keyboardHidden|screenSize" \
-    --insert '//activity[not(@android:name)]' \
-    --type attr -n android:label -v "@string/bluetooth_device_class_settings" \
     --subnode '//activity[not(@android:name)]' \
     --type elem -n intent-filter \
     --insert '//activity[not(@android:name)]/intent-filter' \
@@ -88,7 +84,60 @@ patchsettings() {
     --insert '//activity[not(@android:name)]/meta-data' \
     --type attr -n android:value -v "com.github.teamjcd.android.settings.bluetooth.BluetoothDeviceClassSettings" \
     --insert '//activity[not(@android:name)]' \
+    --type attr -n android:configChanges -v "orientation|keyboardHidden|screenSize" \
+    --insert '//activity[not(@android:name)]' \
+    --type attr -n android:label -v "@string/bluetooth_device_class_settings" \
+    --insert '//activity[not(@android:name)]' \
     --type attr -n android:name -v "com.github.teamjcd.android.settings.bluetooth.BluetoothDeviceClassSettingsActivity" \
+    $tmpdir/$settingsbasename/AndroidManifest.xml
+
+  xmlstarlet ed -L -S \
+    --subnode '/manifest/application' \
+    --type elem -n activity \
+    --subnode '//activity[not(@android:name)]' \
+    --type elem -n intent-filter \
+    --subnode '//activity[not(@android:name)]/intent-filter' \
+    --type elem -n action \
+    --insert '//activity[not(@android:name)]/intent-filter/action' \
+    --type attr -n android:name -v "android.intent.action.VIEW" \
+    --subnode '//activity[not(@android:name)]/intent-filter' \
+    --type elem -n action \
+    --insert '//activity[not(@android:name)]/intent-filter/action[2]' \
+    --type attr -n android:name -v "com.github.teamjcd.android.settings.bluetooth.BluetoothDeviceClassSettings.ACTION_BLUETOOTH_DEVICE_CLASS_EDIT" \
+    --subnode '//activity[not(@android:name)]/intent-filter' \
+    --type elem -n category \
+    --insert '//activity[not(@android:name)]/intent-filter/category' \
+    --type attr -n android:name -v "android.intent.category.DEFAULT" \
+    --subnode '//activity[not(@android:name)]/intent-filter' \
+    --type elem -n data \
+    --insert '//activity[not(@android:name)]/intent-filter/data' \
+    --type attr -n android:mimeType -v "vnd.android.cursor.item/vnd.com.github.teamjcd.android.settings.bluetooth.db.BluetoothDeviceClassContentProvider.device_class" \
+    --subnode '//activity[not(@android:name)]' \
+    --type elem -n intent-filter \
+    --subnode '//activity[not(@android:name)]/intent-filter[2]' \
+    --type elem -n action \
+    --insert '//activity[not(@android:name)]/intent-filter[2]/action' \
+    --type attr -n android:name -v "com.github.teamjcd.android.settings.bluetooth.BluetoothDeviceClassSettings.ACTION_BLUETOOTH_DEVICE_CLASS_INSERT" \
+    --subnode '//activity[not(@android:name)]/intent-filter[2]' \
+    --type elem -n category \
+    --insert '//activity[not(@android:name)]/intent-filter[2]/category' \
+    --type attr -n android:name -v "android.intent.category.DEFAULT" \
+    --subnode '//activity[not(@android:name)]/intent-filter[2]' \
+    --type elem -n data \
+    --insert '//activity[not(@android:name)]/intent-filter[2]/data' \
+    --type attr -n android:mimeType -v "vnd.android.cursor.dir/vnd.com.github.teamjcd.android.settings.bluetooth.db.BluetoothDeviceClassContentProvider.device_class" \
+    --subnode '//activity[not(@android:name)]' \
+    --type elem -n meta-data \
+    --insert '//activity[not(@android:name)]/meta-data' \
+    --type attr -n android:name -v "com.android.settings.FRAGMENT_CLASS" \
+    --insert '//activity[not(@android:name)]/meta-data' \
+    --type attr -n android:value -v "com.github.teamjcd.android.settings.bluetooth.BluetoothDeviceClassEditor" \
+    --insert '//activity[not(@android:name)]' \
+    --type attr -n android:configChanges -v "orientation|keyboardHidden|screenSize" \
+    --insert '//activity[not(@android:name)]' \
+    --type attr -n android:label -v "@string/bluetooth_device_class_edit" \
+    --insert '//activity[not(@android:name)]' \
+    --type attr -n android:name -v "com.github.teamjcd.android.settings.bluetooth.BluetoothDeviceClassEditorActivity" \
     $tmpdir/$settingsbasename/AndroidManifest.xml
 
   xmlstarlet ed -L -S \
