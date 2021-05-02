@@ -12,15 +12,24 @@ tmpdir=$TMPDIR/BluetoothDeviceClassEditor
 # set up extracted files and directories
 chmod -R 755 $archtoolsdir
 alias xmlstarlet=$archtoolsdir/xmlstarlet
+alias zip=$archtoolsdir/zip
 
-apktool_d() {
-  ANDROID_DATA=$tmpdir ANDROID_ROOT=/system LD_LIBRARY_PATH=/system/lib dalvikvm -Xbootclasspath:/system/framework/core.jar:/system/framework/conscrypt.jar:/system/framework/apache-xml.jar -classpath $toolsdir/apktool_*-dexed.jar brut.apktool.Main d --frame-path $tmpdir/framework -o $2 $1
-  test $? != 0 && abort "Decoding APK resources failed. Aborting..."
+baksmali() {
+  ANDROID_DATA=$tmpdir ANDROID_ROOT=/system LD_LIBRARY_PATH=/system/lib dalvikvm \
+    -classpath $toolsdir/baksmali-*-dexed.jar org.jf.baksmali.Main d \
+    -o $2 \
+    $1
+
+  test $? != 0 && abort "Decompiling APK classes failed. Aborting...";
 }
 
-apktool_b() {
-  ANDROID_DATA=$tmpdir ANDROID_ROOT=/system LD_LIBRARY_PATH=/system/lib dalvikvm -Xbootclasspath:/system/framework/core.jar:/system/framework/conscrypt.jar:/system/framework/apache-xml.jar -classpath $toolsdir/apktool_*-dexed.jar brut.apktool.Main b --frame-path $tmpdir/framework --use-aapt2 --aapt $archtoolsdir/aapt2 --copy-original -o $2 $1
-  test $? != 0 && abort "Rebuilding APK resources failed. Aborting..."
+smali() {
+  ANDROID_DATA=$tmpdir ANDROID_ROOT=/system LD_LIBRARY_PATH=/system/lib dalvikvm \
+    -classpath $toolsdir/smali-*-dexed.jar org.jf.smali.Main a \
+    -o $2
+    $1
+
+  test $? != 0 && abort "Rebuilding APK classes failed. Aborting...";
 }
 
 backup() {
@@ -30,11 +39,16 @@ backup() {
   cp -fp $settingspath $backupdir/$settingsbasename.apk
 }
 
-decode() {
-  ui_print "- Decoding $backupdir/$settingsbasename.apk to $tmpdir/$settingsbasename"
+extract() {
+  ui_print "- Extracting $backupdir/$settingsbasename.apk to $tmpdir/$settingsbasename"
 
   mkdir -p $tmpdir/$settingsbasename
-  apktool_d $backupdir/$settingsbasename.apk $tmpdir/$settingsbasename
+  unzip -o $backupdir/$settingsbasename.apk -d $tmpdir/$settingsbasename >&2
+}
+
+decompile() {
+  ui_print "- Decompiling $backupdir/$settingsbasename/classes.dex to $tmpdir/$settingsbasename/classout"
+  baksmali $tmpdir/$settingsbasename/classes.dex $tmpdir/$settingsbasename/classout
 }
 
 patchsettings() {
@@ -156,9 +170,14 @@ patchsettings() {
     $tmpdir/$settingsbasename/res/xml/bluetooth_screen.xml
 }
 
-build() {
-  ui_print "- Rebuilding $tmpdir/$settingsbasename to $tmpdir/$settingsbasename.apk"
-  apktool_b $tmpdir/$settingsbasename $tmpdir/$settingsbasename.apk
+rebuild() {
+  ui_print "- Rebuilding $tmpdir/$settingsbasename/classout to $tmpdir/$settingsbasename/classes.dex"
+  smali $tmpdir/$settingsbasename/classout $tmpdir/$settingsbasename/classes.dex
+}
+
+repackage() {
+  ui_print "- Repackaging $tmpdir/$settingsbasename to $tmpdir/$settingsbasename.apk"
+  zip $tmpdir/$settingsbasename $tmpdir/$settingsbasename.apk
 }
 
 move() {
@@ -179,9 +198,11 @@ otasurvival() {
 }
 
 backup
-decode
+extract
+decompile
 patchsettings
-build
-move
+rebuild
+repackage
+#move
 #cleanup
 otasurvival
