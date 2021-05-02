@@ -16,18 +16,16 @@ alias zip=$archtoolsdir/zip
 
 baksmali() {
   ANDROID_DATA=$tmpdir ANDROID_ROOT=/system LD_LIBRARY_PATH=/system/lib dalvikvm \
-    -classpath $toolsdir/baksmali-*-dexed.jar org.jf.baksmali.Main d \
-    -o $2 \
-    $1
+    -Xmx128m -cp $toolsdir/baksmali-*-dexed.jar org.jf.baksmali.Main \
+    dis -l --seq -a $API -o $2 $1
 
   test $? != 0 && abort "Decompiling APK classes failed. Aborting...";
 }
 
 smali() {
   ANDROID_DATA=$tmpdir ANDROID_ROOT=/system LD_LIBRARY_PATH=/system/lib dalvikvm \
-    -classpath $toolsdir/smali-*-dexed.jar org.jf.smali.Main a \
-    -o $2
-    $1
+    -Xmx166m -cp $toolsdir/smali-*-dexed.jar org.jf.smali.Main \
+    assemble -j 1 -a $API -o $2 $1
 
   test $? != 0 && abort "Rebuilding APK classes failed. Aborting...";
 }
@@ -46,7 +44,7 @@ extract() {
   unzip -o $backupdir/$settingsbasename.apk -d $tmpdir/$settingsbasename >&2
 }
 
-decompile() {
+disassemble() {
   ui_print "- Decompiling $backupdir/$settingsbasename/classes.dex to $tmpdir/$settingsbasename/classout"
   baksmali $tmpdir/$settingsbasename/classes.dex $tmpdir/$settingsbasename/classout
 }
@@ -170,8 +168,8 @@ patchsettings() {
     $tmpdir/$settingsbasename/res/xml/bluetooth_screen.xml
 }
 
-rebuild() {
-  ui_print "- Rebuilding $tmpdir/$settingsbasename/classout to $tmpdir/$settingsbasename/classes.dex"
+reassemble() {
+  ui_print "- Reassambling $tmpdir/$settingsbasename/classout to $tmpdir/$settingsbasename/classes.dex"
   smali $tmpdir/$settingsbasename/classout $tmpdir/$settingsbasename/classes.dex
 }
 
@@ -199,9 +197,9 @@ otasurvival() {
 
 backup
 extract
-decompile
+disassemble
 patchsettings
-rebuild
+reassemble
 repackage
 #move
 #cleanup
